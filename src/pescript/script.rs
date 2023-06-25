@@ -4,7 +4,7 @@
 
 use std::fs;
 
-use crate::pescript::parser;
+use crate::pescript::executor;
 
 // Return all scripts with "./scripts"
 pub fn load_scripts() -> Vec<String> {
@@ -23,5 +23,5 @@ pub fn begin_script(script_file: &str) {
     let contents = fs::read_to_string(format!("./scripts/{}", script_file))
         .expect("Error: Couldn't read file!");
 
-    parser::parse_script(contents);
+    executor::run_script(contents);
 }

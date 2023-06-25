@@ -70,21 +70,25 @@ fn modify_command(line: &str, simulation: &mut Simulation) {
                         obj.velocity.y = new_value;
                     }
                 },
+                "acceleration" => {
+                    if variable.eq_ignore_ascii_case("x") {
+                        obj.acceleration.x = new_value;
+                    } else {
+                        obj.acceleration.y = new_value;
+                    }
+                }
                 _ => break
             }
         }
     } 
 }
 
-fn pause_command(line: &str, simulation: &mut Simulation) {
+fn do_command(line: &str, simulation: &mut Simulation) {
     let mut line = line.split_whitespace();
     let _command = line.next().unwrap();
-    let pause_duration = line.next().unwrap().split(";").next().unwrap().parse::<f64>().unwrap();
+    let do_duration = line.next().unwrap().split(";").next().unwrap().parse::<f64>().unwrap();
 
-    let time = Instant::now();
-    while time.elapsed().as_secs_f64() <= pause_duration {
-        simulation_execute(simulation, simulation.time_elapsed + time.elapsed().as_secs_f64());
-    }
+    simulation_execute(simulation, do_duration);
 }
 
 fn print_command(line: &str, simulation: &mut Simulation) {
@@ -117,15 +121,13 @@ fn print_command(line: &str, simulation: &mut Simulation) {
     }
 }
 
-pub fn parse_script(input: String) {
+pub fn run_script(input: String) {
     print!("\x1B[2J\x1B[1;1H");
     println!("Parsing Script...");
     let mut instructions: Vec<Token> = Vec::new();
     let mut simulation = Simulation::new();
-    let time = Instant::now();
 
     for line in input.lines() {
-        println!("Executing {}", line);
         for token in line.split(" ") {
             match token.to_lowercase().as_str() {
                 "create" => {
@@ -136,8 +138,8 @@ pub fn parse_script(input: String) {
                     instructions.push(Token::MODIFY);
                     modify_command(line, &mut simulation);
                 },
-                "pause" => {
-                    pause_command(line, &mut simulation);
+                "do" => {
+                    do_command(line, &mut simulation);
                 },
                 "print" => {
                     print_command(line, &mut simulation);
@@ -147,7 +149,5 @@ pub fn parse_script(input: String) {
                 } 
             }
         }
-        
-        simulation_execute(&mut simulation, time.elapsed().as_secs_f64());
     }
 }

@@ -2,5 +2,5 @@
 // License: GNU GPL-V3
 // File Purpose: Handle PEScript functions/modules
 
-pub mod parser;
+pub mod executor;
 pub mod script;

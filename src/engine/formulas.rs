@@ -29,7 +29,7 @@ pub fn calc_final_velocity_two(vi: f64, acc: f64, displacement: f64) -> f64 {
 
 // d = vi * t + 1/2(a*t^2)
 pub fn calc_displacement_one(vi: f64, t: f64, acc: f64) -> f64 {
-    (vi * t) + 0.5 * (acc * (t * t))
+    (vi * t) + (0.5 * (acc * (t * t)))
 }
 
 

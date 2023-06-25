@@ -29,7 +29,6 @@ pub struct Simulation {
     pub gravity: f64,
     pub runtime: f64,
     pub should_simulate: bool,
-    pub time_elapsed: f64
 }
 
 impl Simulation {
@@ -40,14 +39,12 @@ impl Simulation {
             gravity: 9.81,
             runtime: 10f64,
             should_simulate: false,
-            time_elapsed: 0f64
         }
     }
 }
 
 pub fn simulation_execute(simulation: &mut Simulation, time: f64) {
-    simulation.time_elapsed = time; 
     for obj in simulation.objects.iter_mut() {
-        obj.position.x = calc_displacement_one(obj.velocity.x, simulation.time_elapsed, obj.acceleration.x); 
+        obj.position.x += calc_displacement_one(obj.velocity.x, time, obj.acceleration.x); 
     }
 }

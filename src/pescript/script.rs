@@ -1,3 +1,7 @@
+// Physics Engine 11 (https://github.com/Camerxxn/PEngine11)
+// License: GNU GPL-V3
+// File Purpose: Read scripts
+
 use std::fs;
 
 use crate::pescript::parser;

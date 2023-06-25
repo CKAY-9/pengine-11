@@ -2,5 +2,7 @@ pes {
     create obj myobj;
     modify myobj velocity x 5;
 
-    print myobj velocity x;
+    pause 5;
+
+    print myobj position x;
 }

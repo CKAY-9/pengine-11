@@ -3,3 +3,4 @@
 // File Purpose: Handle engine functions/modules
 
 pub mod formulas;
+pub mod simulation;

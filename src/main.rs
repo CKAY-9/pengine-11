@@ -12,9 +12,10 @@ fn main() {
     let scripts = pescript::script::load_scripts();
     println!("Loaded scripts!");
 
-    for _ in 0..10 {
-        println!("");
-    }
+    println!("\n\nPEngine 11");
+    println!("A 2D physics engine written in Rust");
+    println!("Original repository: https://github.com/Camerxxn/pengine-11");
+    println!("License: GNU GPL-V3\n\n");
 
     println!("Avaliable Scripts:");
 

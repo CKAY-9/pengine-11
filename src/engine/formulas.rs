@@ -48,6 +48,11 @@ pub fn calc_gravitation_potential(mass: f64, gravity: f64, height: f64) -> f64 {
     mass * gravity * height
 }
 
+pub fn calc_force_with_angle_cos(force: f64, angle: f64) -> f64 {
+    println!("{}", angle.cos());
+    force * (1f64 - angle.cos())
+}
+
 // Ek = 1/2 * m * v^2
 pub fn calc_kinetic_energy(mass: f64, velocity: f64) -> f64 {
     0.5 * mass * (velocity * velocity)
@@ -57,6 +62,8 @@ pub fn calc_kinetic_energy(mass: f64, velocity: f64) -> f64 {
 pub fn calc_spring_potential(k_spring_constant: f64, delta_x: f64) -> f64 {
     0.5 * k_spring_constant * (delta_x * delta_x)
 }
+
+
 
 //
 // FORCE EQUATIONS

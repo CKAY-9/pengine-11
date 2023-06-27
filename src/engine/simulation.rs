@@ -1,10 +1,12 @@
-use super::formulas::{calc_final_velocity_one, calc_displacement_one};
+use super::formulas::{calc_displacement_one, calc_kinetic_energy, calc_hyp, calc_gravitation_potential, calc_force_with_angle_cos};
 
+#[derive(Clone)]
 pub struct Vec2 {
     pub x: f64,
     pub y: f64,
 }
 
+#[derive(Clone)]
 pub struct Object {
     pub name: String,
     pub velocity: Vec2, 
@@ -17,12 +19,31 @@ pub struct Object {
     pub mass: f64,
 }
 
+impl Object {
+    pub fn from_acceleration(&mut self) {
+        self.force.x = calc_force_with_angle_cos(self.mass * self.acceleration.x, self.angle);
+        self.force.y = calc_force_with_angle_cos(self.mass * self.acceleration.y, self.angle);
+    }
+
+    pub fn from_force(&mut self) {
+        self.acceleration.x = calc_force_with_angle_cos(self.force.x, self.angle) / self.mass;
+        self.acceleration.y = calc_force_with_angle_cos(self.force.y, self.angle) / self.mass;
+    }
+
+    pub fn from_mass(&mut self, gravity: f64) {
+        self.kinetic_energy = calc_kinetic_energy(self.mass, calc_hyp(self.velocity.x, self.velocity.y));
+        self.potential_energy = calc_gravitation_potential(self.mass, gravity, self.position.y);
+    }
+}
+
+#[derive(Clone)]
 pub struct Variable {
     pub name: String,
     pub value: f64,
     pub constant: bool
 }
 
+#[derive(Clone)]
 pub struct Simulation {
     pub objects: Vec<Object>,
     pub variables: Vec<Variable>,
@@ -46,5 +67,6 @@ impl Simulation {
 pub fn simulation_execute(simulation: &mut Simulation, time: f64) {
     for obj in simulation.objects.iter_mut() {
         obj.position.x += calc_displacement_one(obj.velocity.x, time, obj.acceleration.x); 
+        obj.position.y += calc_displacement_one(obj.velocity.y, time, obj.acceleration.y);
     }
 }

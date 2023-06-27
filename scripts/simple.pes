@@ -1,10 +1,15 @@
 pes {
     create obj myobj;
-    modify myobj velocity x 5;
-    do 5;
-    print myobj position x;
+    modify myobj angle value 90;
+    modify myobj force y 10;
 
-    modify myobj acceleration x -3;
-    do 3;
+    do 10;
+
+    print myobj position y;
+
+    modify myobj force x -5;
+
+    do 10;
+
     print myobj position x;
 }

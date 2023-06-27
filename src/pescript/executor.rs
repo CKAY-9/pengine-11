@@ -2,29 +2,16 @@
 // License: GNU GPL-V3
 // File Purpose: Parse a script and create an instruction set for the simulation 
 
-use std::time::Instant;
 use crate::engine::simulation::*;
 use crate::engine::formulas::*;
-
-#[derive(Debug)]
-pub enum Token {
-    PES, // Simulation entry
-    CREATE, // Create command
-    MODIFY, // Modify command
-    TARGET, // Object, Let, or Const
-    COMPONENT, // Component of target
-    VARIABLE, // Variable of component
-    VALUE, // New value for variable
-    CONSTANT, // Constant variable
-    LET, // Mutable variable
-    EOC, // End of command
-}
 
 fn create_command(line: &str, simulation: &mut Simulation) {
     let mut line = line.split_whitespace();
     let _command = line.next().unwrap();
     let creation_type = line.next().unwrap();
     let identifier = line.next().unwrap().split(";").next().unwrap().to_string();
+
+    println!("Creating {} with the identifier of {}", creation_type, identifier);
 
     match creation_type {
         // physics object
@@ -60,6 +47,8 @@ fn modify_command(line: &str, simulation: &mut Simulation) {
     let variable = line.next().unwrap();
     let new_value = line.next().unwrap().split(";").next().unwrap().split_whitespace().next().unwrap().parse::<f64>().unwrap();
 
+    println!("Applying modification on {}.{}.{}, new value: {}", target, component, variable, new_value);
+
     for obj in simulation.objects.iter_mut() {
         if obj.name.eq_ignore_ascii_case(target) {
             match component {
@@ -76,7 +65,26 @@ fn modify_command(line: &str, simulation: &mut Simulation) {
                     } else {
                         obj.acceleration.y = new_value;
                     }
-                }
+
+                    obj.from_acceleration();
+                },
+                "mass" => {
+                    obj.mass = new_value;
+
+                    obj.from_mass(simulation.gravity);
+                },
+                "force" => {
+                    if variable.eq_ignore_ascii_case("x") {
+                        obj.force.x = new_value;
+                    } else {
+                        obj.force.y = new_value;
+                    }
+
+                    obj.from_force();
+                },
+                "angle" => {
+                    obj.angle = new_value;
+                },
                 _ => break
             }
         }
@@ -89,6 +97,8 @@ fn do_command(line: &str, simulation: &mut Simulation) {
     let do_duration = line.next().unwrap().split(";").next().unwrap().parse::<f64>().unwrap();
 
     simulation_execute(simulation, do_duration);
+
+    println!("\nDoing {}s of simulation\n", do_duration);
 }
 
 fn print_command(line: &str, simulation: &mut Simulation) {
@@ -102,40 +112,50 @@ fn print_command(line: &str, simulation: &mut Simulation) {
         if obj.name.eq_ignore_ascii_case(target) {
             match component {
                 "velocity" => {
-                    if variable.eq_ignore_ascii_case("x") {
-                        println!("{}.{}.x = {}", obj.name, component, obj.velocity.x);
-                    } else {
-                        println!("{}.{}.y = {}", obj.name, component, obj.velocity.y);
-                    }
+                    println!("{}.{}.{} = {}m/s", obj.name, component, variable, match variable {
+                        "x" => obj.velocity.x,
+                        _ => obj.velocity.y,
+                    });
                 },
                 "position" => {
-                    if variable.eq_ignore_ascii_case("x") {
-                        println!("{}.{}.x = {}", obj.name, component, obj.position.x);
-                    } else {
-                        println!("{}.{}.y = {}", obj.name, component, obj.position.y);
-                    }
-                }
+                    println!("{}.{}.{} = {}m", obj.name, component, variable, match variable {
+                        "x" => obj.position.x,
+                        _ => obj.position.y,
+                    });
+                },
+                "acceleration" => {
+                    println!("{}.{}.{} = {}m/s^2", obj.name, component, variable, match variable {
+                        "x" => obj.acceleration.x,
+                        _ => obj.acceleration.y
+                    });
+                },
+                "force" => {
+                    println!("{}.{}.{} = {}J", obj.name, component, variable, match variable {
+                        "x" => obj.force.x,
+                        _ => obj.force.y
+                    });
+                },
                 _ => break
             }
         }
     }
+
+    println!("");
 }
 
 pub fn run_script(input: String) {
     print!("\x1B[2J\x1B[1;1H");
-    println!("Parsing Script...");
-    let mut instructions: Vec<Token> = Vec::new();
     let mut simulation = Simulation::new();
+
+    println!("Running script/simulation...\n");
 
     for line in input.lines() {
         for token in line.split(" ") {
             match token.to_lowercase().as_str() {
                 "create" => {
-                    instructions.push(Token::CREATE);
                     create_command(line, &mut simulation);
                 },
                 "modify" => {
-                    instructions.push(Token::MODIFY);
                     modify_command(line, &mut simulation);
                 },
                 "do" => {
@@ -150,4 +170,6 @@ pub fn run_script(input: String) {
             }
         }
     }
+
+    println!("Finished simulation!");
 }

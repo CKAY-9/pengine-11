@@ -155,6 +155,10 @@ pub fn run_script(input: String) {
                 "create" => {
                     create_command(line, &mut simulation);
                 },
+                "overtime" => {
+                    simulation.overtime = true;
+                    println!("Enabling overtime simulation");
+                },
                 "modify" => {
                     modify_command(line, &mut simulation);
                 },

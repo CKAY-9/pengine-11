@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use super::formulas::{calc_displacement_one, calc_kinetic_energy, calc_hyp, calc_gravitation_potential, calc_force_with_angle_cos};
 
 #[derive(Clone)]
@@ -50,6 +52,7 @@ pub struct Simulation {
     pub gravity: f64,
     pub runtime: f64,
     pub should_simulate: bool,
+    pub overtime: bool,
 }
 
 impl Simulation {
@@ -60,13 +63,30 @@ impl Simulation {
             gravity: 9.81,
             runtime: 10f64,
             should_simulate: false,
+            overtime: false
         }
     }
 }
 
 pub fn simulation_execute(simulation: &mut Simulation, time: f64) {
-    for obj in simulation.objects.iter_mut() {
-        obj.position.x += calc_displacement_one(obj.velocity.x, time, obj.acceleration.x); 
-        obj.position.y += calc_displacement_one(obj.velocity.y, time, obj.acceleration.y);
+    if simulation.overtime {
+        let instant_now = Instant::now();
+        let mut start_loop = Instant::now().elapsed().as_secs_f64();
+        let mut total_time: f64 = 0f64;
+        while instant_now.elapsed().as_secs_f64() < time {
+            let end_time = Instant::now().elapsed().as_secs_f64() - start_loop;
+            total_time += end_time;
+            for obj in simulation.objects.iter_mut() {
+                obj.position.x += calc_displacement_one(obj.velocity.x, end_time, obj.acceleration.x); 
+                obj.position.y += calc_displacement_one(obj.velocity.y, end_time, obj.acceleration.y);
+            }
+            start_loop = end_time;
+        }
+        println!("{}", total_time);
+    } else {
+        for obj in simulation.objects.iter_mut() {
+            obj.position.x += calc_displacement_one(obj.velocity.x, time, obj.acceleration.x); 
+            obj.position.y += calc_displacement_one(obj.velocity.y, time, obj.acceleration.y);
+        }
     }
 }

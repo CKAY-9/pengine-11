@@ -1,11 +1,10 @@
 pes overtime {
     create obj myobj;
-    modify myobj angle value 90;
+    modify myobj angle value 45;
     modify myobj force value 10;
 
     do 10;
 
     print myobj position y;
-    print myobj acceleration y;
     print myobj position x;
 }

@@ -7,4 +7,11 @@ pes {
 
     print test position x;
     print test position y;
+
+    modify test velocity x 10;
+
+    do 5;
+
+    print test position x;
+    print test position y;
 }

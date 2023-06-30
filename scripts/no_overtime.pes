@@ -1,0 +1,10 @@
+pes {
+    create obj test;
+    modify test angle value 45;
+    modify test force value 10;
+
+    do 10;
+
+    print test position x;
+    print test position y;
+}

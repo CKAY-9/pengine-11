@@ -48,11 +48,6 @@ pub fn calc_gravitation_potential(mass: f64, gravity: f64, height: f64) -> f64 {
     mass * gravity * height
 }
 
-pub fn calc_force_with_angle_cos(force: f64, angle: f64) -> f64 {
-    println!("{}", angle.cos());
-    force * (1f64 - angle.cos())
-}
-
 // Ek = 1/2 * m * v^2
 pub fn calc_kinetic_energy(mass: f64, velocity: f64) -> f64 {
     0.5 * mass * (velocity * velocity)
@@ -82,4 +77,12 @@ pub fn calc_net_force(forces: Vec<f64>) -> f64 {
         net_force += force;
     }
     net_force
+}
+
+pub fn calc_force_with_angle_cos(force: f64, angle: f64) -> f64 {
+    force * (1f64 - angle.to_radians().cos())
+}
+
+pub fn calc_force_with_angle_sin(force: f64, angle: f64) -> f64 {
+    force * (1f64 - angle.to_radians().sin())
 }

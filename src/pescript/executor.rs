@@ -21,7 +21,7 @@ fn create_command(line: &str, simulation: &mut Simulation) {
                 position: Vec2 { x: 0f64, y: 0f64 },
                 acceleration: Vec2 { x: 0f64, y: 0f64 },
                 velocity: Vec2 { x: 0f64, y: 0f64 },
-                force: Vec2 { x: 0f64, y: 0f64 },
+                force: 0f64,
                 mass: 1f64,
                 potential_energy: calc_gravitation_potential(1f64, simulation.gravity, 0f64),
                 kinetic_energy: calc_kinetic_energy(1f64, 0f64),
@@ -74,12 +74,7 @@ fn modify_command(line: &str, simulation: &mut Simulation) {
                     obj.from_mass(simulation.gravity);
                 },
                 "force" => {
-                    if variable.eq_ignore_ascii_case("x") {
-                        obj.force.x = new_value;
-                    } else {
-                        obj.force.y = new_value;
-                    }
-
+                    obj.force = new_value;
                     obj.from_force();
                 },
                 "angle" => {
@@ -130,10 +125,7 @@ fn print_command(line: &str, simulation: &mut Simulation) {
                     });
                 },
                 "force" => {
-                    println!("{}.{}.{} = {}J", obj.name, component, variable, match variable {
-                        "x" => obj.force.x,
-                        _ => obj.force.y
-                    });
+                    println!("{}.{}.{} = {}J", obj.name, component, variable, obj.force);
                 },
                 _ => break
             }

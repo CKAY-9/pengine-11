@@ -1,6 +1,10 @@
-use std::time::Instant;
+// Physics Engine 11 (https://github.com/Camerxxn/PEngine11)
+// License: GNU GPL-V3
+// File Purpose: Handle physics simulation 
 
-use super::formulas::{calc_displacement_one, calc_kinetic_energy, calc_hyp, calc_gravitation_potential, calc_force_with_angle_cos};
+use std::time::{Instant, Duration};
+
+use super::formulas::{calc_displacement_one, calc_kinetic_energy, calc_hyp, calc_gravitation_potential, calc_force_with_angle_cos, calc_force_with_angle_sin};
 
 #[derive(Clone)]
 pub struct Vec2 {
@@ -13,7 +17,7 @@ pub struct Object {
     pub name: String,
     pub velocity: Vec2, 
     pub acceleration: Vec2,
-    pub force: Vec2,
+    pub force: f64,
     pub position: Vec2,
     pub angle: f64,
     pub kinetic_energy: f64,
@@ -23,13 +27,12 @@ pub struct Object {
 
 impl Object {
     pub fn from_acceleration(&mut self) {
-        self.force.x = calc_force_with_angle_cos(self.mass * self.acceleration.x, self.angle);
-        self.force.y = calc_force_with_angle_cos(self.mass * self.acceleration.y, self.angle);
+        self.force = calc_hyp(self.mass * self.acceleration.x, self.mass * self.acceleration.y);
     }
 
     pub fn from_force(&mut self) {
-        self.acceleration.x = calc_force_with_angle_cos(self.force.x, self.angle) / self.mass;
-        self.acceleration.y = calc_force_with_angle_cos(self.force.y, self.angle) / self.mass;
+        self.acceleration.x = calc_force_with_angle_sin(self.force, self.angle) / self.mass;
+        self.acceleration.y = calc_force_with_angle_cos(self.force, self.angle) / self.mass;
     }
 
     pub fn from_mass(&mut self, gravity: f64) {
@@ -71,18 +74,13 @@ impl Simulation {
 pub fn simulation_execute(simulation: &mut Simulation, time: f64) {
     if simulation.overtime {
         let instant_now = Instant::now();
-        let mut start_loop = Instant::now().elapsed().as_secs_f64();
-        let mut total_time: f64 = 0f64;
-        while instant_now.elapsed().as_secs_f64() < time {
-            let end_time = Instant::now().elapsed().as_secs_f64() - start_loop;
-            total_time += end_time;
+        while instant_now.elapsed().as_secs_f64() < time { 
             for obj in simulation.objects.iter_mut() {
-                obj.position.x += calc_displacement_one(obj.velocity.x, end_time, obj.acceleration.x); 
-                obj.position.y += calc_displacement_one(obj.velocity.y, end_time, obj.acceleration.y);
+                obj.position.x = calc_displacement_one(obj.velocity.x, instant_now.elapsed().as_secs_f64(), obj.acceleration.x); 
+                obj.position.y = calc_displacement_one(obj.velocity.y, instant_now.elapsed().as_secs_f64(), obj.acceleration.y);
             }
-            start_loop = end_time;
         }
-        println!("{}", total_time);
+
     } else {
         for obj in simulation.objects.iter_mut() {
             obj.position.x += calc_displacement_one(obj.velocity.x, time, obj.acceleration.x); 
